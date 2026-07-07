@@ -13,9 +13,9 @@ import cv2
 import numpy as np
 from typing import List, Optional, Tuple
 
-from .texture import Texture
-from .layer import Layer
-from .blend import BLEND_MODES
+from graphics.texture import Texture
+from graphics.layer import Layer
+from graphics.blend import BLEND_MODES, blend_alpha
 
 
 class Renderer:
@@ -200,6 +200,18 @@ class Renderer:
     # Output
     # ============================================================
 
+    def save(self, path: str) -> None:
+        """
+        Save the current canvas to disk.
+
+        Args:
+            path: Output file path
+        """
+        if self.canvas is None:
+            raise RuntimeError("Canvas is empty. Render something first.")
+
+        cv2.imwrite(path, self.canvas)
+
     def to_texture(self) -> Texture:
         """
         Convert the current canvas to a Texture.
@@ -211,10 +223,6 @@ class Renderer:
             raise RuntimeError("Canvas is empty. Render something first.")
 
         return Texture(self.canvas.copy())
-
-
-# Need to import blend_alpha for default
-from .blend import blend_alpha
 
 
 # ============================================================

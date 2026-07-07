@@ -22,9 +22,9 @@ import math
 import random
 from typing import Any, Dict, Optional, Tuple
 
-from .base import Effect
-from ..geometry.vec2 import Vec2
-from ..geometry.spring import Vec2Spring, ScalarSpring
+from effects.base import Effect
+from geometry.vec2 import Vec2
+from geometry.spring import Vec2Spring, ScalarSpring
 
 
 class CameraEffect(Effect):

@@ -17,10 +17,11 @@ from __future__ import annotations
 
 import math
 import numpy as np
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, Any
 
-from ..geometry.vec2 import Vec2
-from .texture import Texture
+# Use absolute imports
+from geometry.vec2 import Vec2
+from graphics.texture import Texture
 
 
 class Layer:
@@ -38,12 +39,13 @@ class Layer:
         blend_mode: Blend mode ('alpha', 'add', 'multiply', 'screen', 'overlay')
         visible: Whether the layer is rendered
         name: Optional identifier for debugging
+        _effects: List of attached effects
     """
 
     __slots__ = (
         'texture', 'mask', 'position', 'scale',
         'rotation', 'pivot', 'opacity', 'blend_mode',
-        'visible', 'name'
+        'visible', 'name', '_effects'
     )
 
     def __init__(
@@ -102,6 +104,7 @@ class Layer:
         self.blend_mode = str(blend_mode)
         self.visible = bool(visible)
         self.name = str(name)
+        self._effects = []
 
     # ============================================================
     # Transform Operations
@@ -193,8 +196,6 @@ class Layer:
 
         Returns:
             2D grayscale array (HxW) with values 0-255, or None if fully opaque
-
-        TODO: Cache this and invalidate on changes.
         """
         # Start with texture alpha or full white
         if self.texture.has_alpha():
@@ -242,10 +243,42 @@ class Layer:
         return self.position.copy()
 
     # ============================================================
+    # Effect Management
+    # ============================================================
+
+    def add_effect(self, effect) -> None:
+        """
+        Add an effect to this layer.
+
+        Args:
+            effect: The effect to add
+        """
+        effect.attach(self)
+        self._effects.append(effect)
+
+    def remove_effect(self, effect) -> None:
+        """Remove an effect from this layer."""
+        if effect in self._effects:
+            effect.detach()
+            self._effects.remove(effect)
+
+    def clear_effects(self) -> None:
+        """Remove all effects from this layer."""
+        for effect in self._effects:
+            effect.detach()
+        self._effects.clear()
+
+    def update_effects(self, dt: float) -> None:
+        """Update all attached effects."""
+        for effect in self._effects:
+            if effect.enabled:
+                effect.update(dt)
+
+    # ============================================================
     # Copy
     # ============================================================
 
-    def copy(self) -> Layer:
+    def copy(self) -> 'Layer':
         """Create a copy of this layer."""
         layer = Layer(
             texture=self.texture.copy(),
@@ -259,6 +292,10 @@ class Layer:
             visible=self.visible,
             name=self.name
         )
+        # Copy effects
+        for effect in self._effects:
+            # This is a shallow copy - effects are not deep copied
+            layer._effects.append(effect)
         return layer
 
     # ============================================================

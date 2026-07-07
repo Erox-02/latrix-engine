@@ -21,9 +21,10 @@ import math
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, List, Tuple
 
-from ..graphics.layer import Layer
-from ..geometry.vec2 import Vec2
-from ..geometry.easing import EASING_FUNCTIONS
+# Use absolute imports
+from graphics.layer import Layer
+from geometry.vec2 import Vec2
+from geometry.easing import EASING_FUNCTIONS
 
 
 class Effect(ABC):

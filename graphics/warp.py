@@ -22,8 +22,8 @@ import numpy as np
 import cv2
 from typing import Optional, Tuple, List
 
-from ..geometry.vec2 import Vec2
-from .texture import Texture
+from geometry.vec2 import Vec2
+from graphics.texture import Texture
 
 
 class WarpMesh:
